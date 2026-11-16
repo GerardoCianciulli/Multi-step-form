@@ -32,7 +32,7 @@ Your users should be able to:
   - The email address is not formatted correctly
   - A step is submitted, but no selection has been made
 
-Want some support on the challenge? [Join our Slack community](https://www.frontendmentor.io/slack) and ask questions in the **#help** channel.
+For this build I used Formik and Yup to validate the personal info step (name of 2 to 5 words, an email formatted as `name@domain.suffix`, and a phone number formatted as `+1 438 507 7799`), a monthly / yearly toggle (`planDateSetAs`) that updates prices across steps 2 to 4, and `fetch` to POST each new member to a local json-server.
 
 ### Links
 
@@ -46,56 +46,77 @@ Want some support on the challenge? [Join our Slack community](https://www.front
 - CSS custom properties
 - Flexbox
 - CSS Grid
-- Desktop-first workflow with media queries
-- [React](https://react.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vite.dev/)
+- Media Queries (desktop first)
+- React
+- Typescript
+- Vite
+- Formik
+- Yup
 - Fetch API
-- [JSON Server](https://github.com/typicode/json-server)
-- [gh-pages](https://github.com/tschaub/gh-pages)
+- JSON Server
+- gh-pages
 
 ### What I learned
 
-I learned how to let a single piece of state drive several steps of a form. The `planDateSetAs` state lives in `App` and is passed down to the plan, add-ons and summary steps, so flipping the monthly / yearly toggle updates every price at once. Typing it as a union keeps the price lookups safe:
+**Multi-step validation with Formik and Yup.** A single `<Formik>` wraps every step, and the `validationSchema` prop only gets a schema on step 1. Steps 2 to 4 submit without field validation, so `onSubmit` doubles as the "Next Step" handler and only step 4 posts the data.
 
 ```tsx
-export type PlanDate = 'monthly' | 'yearly'
-export type Price = Record<PlanDate, number>
-
-export function formatPrice(amount: number, planDateSetAs: PlanDate, sign = '') {
-  return `${sign}$${amount}/${planDateSetAs === 'monthly' ? 'mo' : 'yr'}`
-}
-
-// Inside a step component
-<span className="plan__price">{formatPrice(plan.price[planDateSetAs], planDateSetAs)}</span>
+<Formik
+  initialValues={initialValues}
+  validationSchema={step === 1 ? personalInfoSchema : undefined}
+  onSubmit={handleSubmit}
+>
 ```
 
-I also learned how to post form data with `fetch` to a local [JSON Server](https://github.com/typicode/json-server). Running `npm run server` serves `db.json` as a REST API, and confirming the form saves a new entry to the `members` collection:
+Yup's `.test()` made the "two words or more and less than six" name rule easy to express next to the built-in `required` and `matches` rules:
 
 ```ts
-export async function postMember(member: NewMember) {
-  const response = await fetch(`${API_URL}/members`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(member),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Could not save member (status ${response.status})`)
-  }
-
-  return response.json()
-}
+name: Yup.string()
+  .trim()
+  .required('This field is required')
+  .test('word-count', 'Enter 2 to 5 words', (value) => {
+    const count = words(value).length
+    return count >= 2 && count < 6
+  }),
+phone: Yup.string()
+  .trim()
+  .required('This field is required')
+  .matches(/^\+\d{1,3} \d{3} \d{3} \d{4}$/, 'Use format +1 438 507 7799'),
 ```
 
-Finally, I used the CSS `:has()` selector to give the custom plan and add-on cards a visible keyboard focus state, even though the real radio and checkbox inputs are visually hidden:
+**Formatting input as the user types.** The phone field passes its own `onChange` to Formik's `<Field>` and stores a formatted value with `setFieldValue`, so `14385077799` is shown as `+1 438 507 7799`. Since the last 10 digits are always area code + number, anything before them is the country code.
+
+**Checkbox arrays and radio groups in Formik.** Giving several checkboxes the same `name` and a `value` makes Formik store the checked values as an array, which is exactly what the add-ons step needs:
+
+```tsx
+<Field type="checkbox" name="addOns" value={addOn.id} className="visually-hidden" />
+```
+
+**Styling selected cards with `:has()`.** The real radio and checkbox inputs are visually hidden inside each card's `<label>`, and the card reacts to their state without any extra React state:
 
 ```css
-.plan:hover,
-.plan:has(input:focus-visible) {
+.plan-card:hover,
+.plan-card:has(:focus-visible) {
   border-color: var(--purplish-blue);
 }
+
+.plan-card:has(:checked) {
+  border-color: var(--purplish-blue);
+  background-color: var(--alabaster);
+}
 ```
+
+**Posting to json-server with fetch.** Run `npm run server` to start json-server on port 3000; confirming the form POSTs the new member to the `members` collection in `db.json`.
+
+```ts
+const response = await fetch(`${API_URL}/members`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(member),
+})
+```
+
+The GitHub Pages build has no json-server behind it, so the save step is skipped there unless a hosted API is set with `VITE_API_URL`.
 
 ## Author
 
@@ -116,7 +137,7 @@ Feel free to use any workflow that you feel comfortable with. Below is a suggest
 
 ## Deploying your project
 
-As mentioned above, there are many ways to host your project for free. Our recommend hosts are:
+As mentioned above, there are many ways to host your project for free. Our recommended hosts are:
 
 - [GitHub Pages](https://pages.github.com/)
 - [Vercel](https://vercel.com/)
@@ -142,7 +163,7 @@ Remember, if you're looking for feedback on your solution, be sure to ask questi
 
 There are multiple places you can share your solution:
 
-1. Share your solution page in the **#finished-projects** channel of the [Slack community](https://www.frontendmentor.io/slack). 
+1. Share your solution page in the **#finished-projects** channel of the [community](https://www.frontendmentor.io/community). 
 2. Tweet [@frontendmentor](https://twitter.com/frontendmentor) and mention **@frontendmentor**, including the repo and live URLs in the tweet. We'd love to take a look at what you've built and help share it around.
 3. Share your solution on other social channels like LinkedIn.
 4. Blog about your experience building your project. Writing about your workflow, technical choices, and talking through your code is a brilliant way to reinforce what you've learned. Great platforms to write on are [dev.to](https://dev.to/), [Hashnode](https://hashnode.com/), and [CodeNewbie](https://community.codenewbie.org/).
