@@ -1,6 +1,6 @@
-import { formatPhone } from '../validation'
-import StepHeader from './StepHeader'
-import TextField from './TextField'
+import { formatPhone } from "../validation";
+import StepHeader from "./StepHeader";
+import TextField from "./TextField";
 
 const PersonalInfoStep = () => (
   <>
@@ -9,7 +9,13 @@ const PersonalInfoStep = () => (
       description="Please provide your name, email address, and phone number."
     />
     <div className="fields">
-      <TextField name="name" label="Name" placeholder="e.g. Stephen King" autoComplete="name" />
+      <TextField
+        name="name"
+        label="Name"
+        type="text"
+        placeholder="e.g. Stephen King"
+        autoComplete="name"
+      />
       <TextField
         name="email"
         label="Email Address"
@@ -22,12 +28,12 @@ const PersonalInfoStep = () => (
         label="Phone Number"
         type="tel"
         inputMode="tel"
-        placeholder="e.g. +1 234 567 890"
+        placeholder="e.g. +1 234 567 8901"
         autoComplete="tel"
         format={formatPhone}
       />
     </div>
   </>
-)
+);
 
-export default PersonalInfoStep
+export default PersonalInfoStep;
