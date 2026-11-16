@@ -1,31 +1,35 @@
 /* ==========================================================================
-   Desktop (designed at 1440px) — mobile overrides live at the bottom.
+   Desktop (design width 1440px) — mobile overrides at the bottom
    ========================================================================== */
 
-.app {
+/* ---------- Page & card ---------- */
+
+.page {
   display: grid;
   place-items: center;
+  min-height: 100vh;
   min-height: 100dvh;
-  padding: 2rem 1rem;
+  padding: 1rem;
 }
 
 .card {
   display: flex;
   width: 100%;
-  max-width: 58.75rem;
-  min-height: 37.5rem;
+  max-width: 58.75rem; /* 940px */
+  min-height: 37.5rem; /* 600px */
   padding: 1rem;
   background-color: var(--white);
   border-radius: 0.9375rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow);
 }
 
 /* ---------- Sidebar ---------- */
 
 .sidebar {
-  flex: 0 0 17.125rem;
-  min-height: 35.5rem;
-  padding: 2.375rem 2rem;
+  flex-shrink: 0;
+  width: 17.125rem; /* 274px */
+  min-height: 35.5rem; /* 568px */
+  padding: 2.5rem 2rem;
   background: var(--purplish-blue) url('./assets/images/bg-sidebar-desktop.svg') no-repeat bottom center / cover;
   border-radius: 0.625rem;
 }
@@ -33,7 +37,7 @@
 .sidebar__steps {
   display: flex;
   flex-direction: column;
-  gap: 1.8125rem;
+  gap: 2rem;
 }
 
 .sidebar__step {
@@ -48,74 +52,128 @@
   flex-shrink: 0;
   width: 2.0625rem;
   height: 2.0625rem;
-  border: 0.0625rem solid var(--white);
-  border-radius: 50%;
-  color: var(--white);
   font-size: 0.875rem;
   font-weight: 700;
-  line-height: 1;
+  color: var(--white);
+  border: 0.0625rem solid var(--white);
+  border-radius: 50%;
 }
 
 .sidebar__step--active .sidebar__number {
+  color: var(--marine-blue);
   background-color: var(--light-blue);
   border-color: var(--light-blue);
-  color: var(--marine-blue);
-}
-
-.sidebar__info {
-  display: flex;
-  flex-direction: column;
-  text-transform: uppercase;
 }
 
 .sidebar__label {
-  color: var(--pastel-blue);
   font-size: 0.75rem;
-  line-height: 1.1875rem;
+  line-height: 0.875rem;
+  color: var(--pastel-blue);
+  text-transform: uppercase;
 }
 
 .sidebar__title {
-  color: var(--white);
+  margin-top: 0.25rem;
   font-size: 0.875rem;
   font-weight: 700;
+  line-height: 1rem;
   letter-spacing: 0.0625rem;
-  line-height: 1.0625rem;
+  color: var(--white);
+  text-transform: uppercase;
 }
 
-/* ---------- Form area ---------- */
+/* ---------- Form layout ---------- */
 
-.card__content {
+.form {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  padding: 2.5rem 5.25rem 1rem 6.25rem;
+  padding: 2.5rem 5.25rem 1rem 6.25rem; /* content column is 450px wide */
 }
 
-.step {
+.form__body {
   flex: 1;
 }
 
-.step__header {
-  margin-bottom: 2.25rem;
+.form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 2rem;
 }
 
-.step__title {
-  color: var(--marine-blue);
+.form__error {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--strawberry-red);
+}
+
+/* ---------- Step header ---------- */
+
+.step-header {
+  margin-bottom: 2.1875rem;
+}
+
+.step-header__title {
   font-size: 2rem;
   font-weight: 700;
   line-height: 2.3125rem;
 }
 
-.step__title:focus {
+.step-header__title:focus,
+.thank-you__title:focus {
   outline: none;
 }
 
-.step__description {
+.step-header__description {
   margin-top: 0.6875rem;
-  color: var(--cool-gray);
   font-size: 1rem;
-  line-height: 1.5rem;
+  line-height: 1.5625rem;
+  color: var(--cool-gray);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  height: 3rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn--next,
+.btn--confirm {
+  min-width: 7.6875rem; /* 123px */
+  padding: 0 1.5rem;
+  color: var(--white);
+  background-color: var(--marine-blue);
+}
+
+.btn--next:hover {
+  background-color: var(--marine-blue-hover);
+}
+
+.btn--confirm {
+  background-color: var(--purplish-blue);
+}
+
+.btn--confirm:hover,
+.btn--confirm:disabled {
+  background-color: var(--purplish-blue-hover);
+}
+
+.btn--back {
+  margin-right: auto;
+  padding: 0;
+  color: var(--cool-gray);
+}
+
+.btn--back:hover {
+  color: var(--marine-blue);
 }
 
 /* ---------- Step 1: personal info ---------- */
@@ -126,49 +184,53 @@
   gap: 1.5rem;
 }
 
-.field__row {
+.field__top {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .field__label {
-  color: var(--marine-blue);
   font-size: 0.875rem;
   line-height: 1rem;
 }
 
 .field__error {
-  color: var(--strawberry-red);
   font-size: 0.875rem;
   font-weight: 700;
   line-height: 1rem;
+  color: var(--strawberry-red);
+  text-align: right;
 }
 
 .field__input {
+  display: block;
   width: 100%;
   height: 3rem;
   padding: 0 1rem;
-  border: 0.0625rem solid var(--light-gray);
-  border-radius: 0.5rem;
-  background-color: var(--white);
-  color: var(--marine-blue);
   font-size: 1rem;
   font-weight: 500;
+  color: var(--marine-blue);
+  background-color: var(--white);
+  border: 0.0625rem solid var(--light-gray);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
 .field__input::placeholder {
   color: var(--cool-gray);
+  opacity: 1;
 }
 
+.field__input:hover,
 .field__input:focus {
-  outline: none;
   border-color: var(--purplish-blue);
 }
 
-.field__input--invalid,
-.field__input--invalid:focus {
+.field--error .field__input {
   border-color: var(--strawberry-red);
 }
 
@@ -179,73 +241,75 @@
   gap: 1.125rem;
 }
 
-.plan {
+.plan-card {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 1.25rem 1rem 1rem;
+  min-width: 0;
+  padding: 1.25rem 1rem;
   border: 0.0625rem solid var(--light-gray);
   border-radius: 0.5rem;
   cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
-.plan:hover,
-.plan:has(input:focus-visible) {
+.plan-card:hover,
+.plan-card:has(:focus-visible) {
   border-color: var(--purplish-blue);
 }
 
-.plan--selected {
+.plan-card:has(:checked) {
   border-color: var(--purplish-blue);
   background-color: var(--alabaster);
 }
 
-.plan__icon {
+.plan-card__icon {
   width: 2.5rem;
   height: 2.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.4375rem;
 }
 
-.plan__details {
+.plan-card__text {
   display: flex;
   flex-direction: column;
 }
 
-.plan__name {
-  color: var(--marine-blue);
+.plan-card__name {
   font-size: 1rem;
   font-weight: 500;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
 }
 
-.plan__price {
-  margin-top: 0.1875rem;
-  color: var(--cool-gray);
+.plan-card__price {
+  margin-top: 0.4375rem;
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1rem;
+  color: var(--cool-gray);
 }
 
-.plan__bonus {
-  margin-top: 0.125rem;
-  color: var(--marine-blue);
+.plan-card__promo {
+  margin-top: 0.4375rem;
   font-size: 0.75rem;
-  line-height: 1.25rem;
+  line-height: 0.875rem;
 }
 
 .billing-toggle {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
   height: 3rem;
   margin-top: 2rem;
-  border-radius: 0.5rem;
   background-color: var(--alabaster);
+  border-radius: 0.5rem;
 }
 
 .billing-toggle__label {
-  color: var(--cool-gray);
+  padding: 0;
   font-size: 0.875rem;
   font-weight: 500;
+  color: var(--cool-gray);
+  transition: color 0.2s;
 }
 
 .billing-toggle__label--active {
@@ -256,8 +320,9 @@
   position: relative;
   width: 2.375rem;
   height: 1.25rem;
-  border-radius: 0.625rem;
+  padding: 0;
   background-color: var(--marine-blue);
+  border-radius: 0.625rem;
 }
 
 .billing-toggle__knob {
@@ -266,9 +331,9 @@
   left: 0.25rem;
   width: 0.75rem;
   height: 0.75rem;
-  border-radius: 50%;
   background-color: var(--white);
-  transition: transform 0.2s ease;
+  border-radius: 50%;
+  transition: transform 0.2s;
 }
 
 .billing-toggle__switch[aria-checked='true'] .billing-toggle__knob {
@@ -287,19 +352,20 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  min-height: 5.0625rem;
-  padding: 1.125rem 1.5rem;
+  min-height: 5.0625rem; /* 81px */
+  padding: 0.75rem 1.5rem;
   border: 0.0625rem solid var(--light-gray);
   border-radius: 0.5rem;
   cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .add-on:hover,
-.add-on:has(input:focus-visible) {
+.add-on:has(:focus-visible) {
   border-color: var(--purplish-blue);
 }
 
-.add-on--selected {
+.add-on:has(:checked) {
   border-color: var(--purplish-blue);
   background-color: var(--alabaster);
 }
@@ -312,78 +378,70 @@
   height: 1.25rem;
   border: 0.0625rem solid var(--light-gray);
   border-radius: 0.25rem;
-  background-color: var(--white);
 }
 
-.add-on__checkbox img {
-  width: 0.75rem;
-  height: 0.5625rem;
-  visibility: hidden;
-}
-
-.add-on--selected .add-on__checkbox {
+.add-on:has(:checked) .add-on__checkbox {
+  background: var(--purplish-blue) url('./assets/images/icon-checkmark.svg') no-repeat center / 0.75rem;
   border-color: var(--purplish-blue);
-  background-color: var(--purplish-blue);
 }
 
-.add-on--selected .add-on__checkbox img {
-  visibility: visible;
-}
-
-.add-on__details {
+.add-on__text {
   display: flex;
   flex-direction: column;
-  gap: 0.1875rem;
+  gap: 0.4375rem;
   flex: 1;
+  min-width: 0;
 }
 
 .add-on__name {
-  color: var(--marine-blue);
   font-size: 1rem;
   font-weight: 500;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
 }
 
 .add-on__description {
-  color: var(--cool-gray);
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1rem;
+  color: var(--cool-gray);
 }
 
 .add-on__price {
-  color: var(--purplish-blue);
   font-size: 0.875rem;
   line-height: 1.25rem;
+  color: var(--purplish-blue);
 }
 
 /* ---------- Step 4: summary ---------- */
 
 .summary {
-  padding: 1.25rem 1.5rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 1.375rem;
   background-color: var(--alabaster);
+  border-radius: 0.5rem;
 }
 
 .summary__plan {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .summary__plan-name {
-  color: var(--marine-blue);
   font-size: 1rem;
   font-weight: 500;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
 }
 
 .summary__change {
-  margin-top: 0.1875rem;
-  color: var(--cool-gray);
+  margin-top: 0.4375rem;
+  padding: 0;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  color: var(--cool-gray);
   text-decoration: underline;
+  text-decoration-thickness: 0.0625rem;
   text-underline-offset: 0.125rem;
+  transition: color 0.2s;
 }
 
 .summary__change:hover {
@@ -391,7 +449,6 @@
 }
 
 .summary__plan-price {
-  color: var(--marine-blue);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -400,17 +457,18 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1.375rem;
-  padding-top: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.125rem;
   border-top: 0.0625rem solid var(--light-gray);
 }
 
 .summary__add-on {
   display: flex;
   justify-content: space-between;
-  color: var(--cool-gray);
+  gap: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  color: var(--cool-gray);
 }
 
 .summary__add-on-price {
@@ -419,102 +477,58 @@
 
 .summary__total {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 1.25rem;
-  padding: 0 1.5rem;
-  color: var(--cool-gray);
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 0;
   font-size: 0.875rem;
+  color: var(--cool-gray);
 }
 
 .summary__total-price {
-  color: var(--purplish-blue);
   font-size: 1.25rem;
   font-weight: 700;
+  color: var(--purplish-blue);
 }
 
-/* ---------- Thank you ---------- */
+/* ---------- Step 5: thank you ---------- */
 
-.step--thank-you {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 1.5rem;
+.form--complete .form__body {
+  display: grid;
+  place-items: center;
+  padding-bottom: 2.5rem;
+}
+
+.thank-you {
   text-align: center;
 }
 
 .thank-you__icon {
   width: 5rem;
   height: 5rem;
-  margin-bottom: 2rem;
+  margin: 0 auto 2rem;
 }
 
-.step--thank-you .step__description {
+.thank-you__title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 2.3125rem;
+}
+
+.thank-you__text {
   margin-top: 0.875rem;
-  line-height: 1.5625rem;
-}
-
-/* ---------- Navigation buttons ---------- */
-
-.form-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 2rem;
-}
-
-.button {
-  height: 3rem;
-  border-radius: 0.5rem;
   font-size: 1rem;
-  font-weight: 500;
-}
-
-.button--next,
-.button--confirm {
-  min-width: 7.6875rem;
-  margin-left: auto;
-  padding: 0 1.5rem;
-  color: var(--white);
-}
-
-.button--next {
-  background-color: var(--marine-blue);
-}
-
-.button--next:hover {
-  background-color: var(--marine-blue-hover);
-}
-
-.button--confirm {
-  background-color: var(--purplish-blue);
-}
-
-.button--confirm:hover {
-  background-color: var(--purplish-blue-hover);
-}
-
-.button--confirm:disabled {
-  cursor: progress;
-  background-color: var(--purplish-blue-hover);
-}
-
-.button--back {
+  line-height: 1.5625rem;
   color: var(--cool-gray);
 }
 
-.button--back:hover {
-  color: var(--marine-blue);
-}
-
 /* ==========================================================================
-   Small desktop / tablet: tighten the form padding so the card still fits.
+   Narrow desktop / tablet — keep the side-by-side layout, tighten spacing
    ========================================================================== */
 
 @media (max-width: 60rem) {
-  .card__content {
-    padding-inline: 2.5rem;
+  .form {
+    padding: 2.5rem 1.5rem 1rem 2.5rem;
   }
 
   .plans {
@@ -523,11 +537,11 @@
 }
 
 /* ==========================================================================
-   Mobile (designed at 375px)
+   Mobile (design width 375px)
    ========================================================================== */
 
 @media (max-width: 47.9375rem) {
-  .app {
+  .page {
     display: block;
     padding: 0;
   }
@@ -535,6 +549,7 @@
   .card {
     flex-direction: column;
     max-width: none;
+    min-height: 100vh;
     min-height: 100dvh;
     padding: 0;
     background-color: transparent;
@@ -542,10 +557,10 @@
     box-shadow: none;
   }
 
-  /* Sidebar becomes the image header with numbered steps only. */
+  /* Sidebar becomes the top banner with step numbers only */
   .sidebar {
-    flex: 0 0 10.75rem;
-    min-height: 10.75rem;
+    width: 100%;
+    min-height: 10.75rem; /* 172px */
     padding: 2rem 1rem 0;
     background-image: url('./assets/images/bg-sidebar-mobile.svg');
     background-position: top center;
@@ -558,36 +573,56 @@
     gap: 1rem;
   }
 
-  .sidebar__info {
+  .sidebar__text {
     display: none;
   }
 
-  .card__content {
+  .form {
     padding: 0;
   }
 
-  /* Each step sits in a floating white card overlapping the header. */
-  .step {
-    flex: none;
-    margin: -4.5625rem 1rem 1.5rem;
+  .form__body {
+    flex: 0 0 auto;
+    margin: -4.5625rem 1rem 1.5rem; /* card starts 99px from the top */
     padding: 2rem 1.5rem;
-    border-radius: 0.625rem;
     background-color: var(--white);
-    box-shadow: var(--shadow-card);
+    border-radius: 0.625rem;
+    box-shadow: var(--shadow);
   }
 
-  .step__header {
-    margin-bottom: 1.25rem;
+  .form__footer {
+    margin-top: auto;
+    padding: 1rem;
+    background-color: var(--white);
   }
 
-  .step__title {
+  .step-header {
+    margin-bottom: 1.375rem;
+  }
+
+  .step-header__title {
     font-size: 1.5rem;
     line-height: 1.75rem;
   }
 
-  .step__description {
+  .step-header__description {
     margin-top: 0.5625rem;
-    line-height: 1.5625rem;
+  }
+
+  .btn {
+    height: 2.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+  }
+
+  .btn--next,
+  .btn--confirm {
+    min-width: 6.0625rem; /* 97px */
+    padding: 0 1rem;
+  }
+
+  .btn--back {
+    border-radius: 0;
   }
 
   /* Step 1 */
@@ -595,8 +630,8 @@
     gap: 1rem;
   }
 
-  .field__row {
-    margin-bottom: 0.25rem;
+  .field__top {
+    margin-bottom: 0.1875rem;
   }
 
   .field__label,
@@ -607,8 +642,8 @@
 
   .field__input {
     height: 2.5rem;
-    border-radius: 0.25rem;
     font-size: 0.9375rem;
+    border-radius: 0.25rem;
   }
 
   /* Step 2 */
@@ -617,19 +652,15 @@
     gap: 0.75rem;
   }
 
-  .plan {
+  .plan-card {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.875rem;
-    padding: 1rem;
+    padding: 1.125rem 1rem;
   }
 
-  .plan__icon {
+  .plan-card__icon {
     margin-bottom: 0;
-  }
-
-  .plan__price {
-    margin-top: 0.125rem;
   }
 
   .billing-toggle {
@@ -643,16 +674,17 @@
 
   .add-on {
     gap: 1rem;
-    min-height: 3.875rem;
+    min-height: 3.875rem; /* 62px */
     padding: 0.75rem 1rem;
   }
 
-  .add-on__details {
-    gap: 0;
+  .add-on__text {
+    gap: 0.1875rem;
   }
 
   .add-on__name {
     font-size: 0.875rem;
+    line-height: 1rem;
   }
 
   .add-on__description,
@@ -671,7 +703,7 @@
   }
 
   .summary__change {
-    margin-top: 0;
+    margin-top: 0.1875rem;
   }
 
   .summary__add-ons {
@@ -681,15 +713,15 @@
   }
 
   .summary__total {
-    padding: 0 1rem;
+    padding: 1.5rem 1rem 0;
   }
 
   .summary__total-price {
     font-size: 1rem;
   }
 
-  /* Thank you */
-  .step--thank-you {
+  /* Step 5 */
+  .form--complete .form__body {
     padding: 5rem 1.5rem;
   }
 
@@ -699,26 +731,12 @@
     margin-bottom: 1.5rem;
   }
 
-  .step--thank-you .step__description {
+  .thank-you__title {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+
+  .thank-you__text {
     margin-top: 0.5625rem;
-  }
-
-  /* Navigation pinned to the bottom of the screen */
-  .form-nav {
-    margin-top: auto;
-    padding: 1rem;
-    background-color: var(--white);
-  }
-
-  .button {
-    height: 2.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-  }
-
-  .button--next,
-  .button--confirm {
-    min-width: 6.0625rem;
-    padding: 0 1rem;
   }
 }

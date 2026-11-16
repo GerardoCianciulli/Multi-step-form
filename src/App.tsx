@@ -1,188 +1,118 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import {
-  ADD_ONS,
-  PLANS,
-  STEPS,
-  getTotal,
-  type AddOnId,
-  type PersonalInfo,
-  type PlanDate,
-  type PlanId,
-} from './data'
-import { postMember } from './api'
-import Sidebar from './components/Sidebar'
-import PersonalInfoStep, { type PersonalInfoErrors } from './components/PersonalInfoStep'
-import SelectPlanStep from './components/SelectPlanStep'
+import { Form, Formik } from 'formik'
+import { useEffect, useRef, useState } from 'react'
+import { API_URL, postMember, toNewMember } from './api'
 import AddOnsStep from './components/AddOnsStep'
+import PersonalInfoStep from './components/PersonalInfoStep'
+import SelectPlanStep from './components/SelectPlanStep'
+import Sidebar from './components/Sidebar'
 import SummaryStep from './components/SummaryStep'
 import ThankYouStep from './components/ThankYouStep'
+import { initialValues, type FormValues } from './data'
+import { personalInfoSchema } from './validation'
 import './App.css'
 
-const LAST_STEP = STEPS.length - 1
-const THANK_YOU_STEP = STEPS.length
+type Step = 1 | 2 | 3 | 4 | 5
 
-const REQUIRED_MESSAGE = 'This field is required'
-const PLAN_REQUIRED_MESSAGE = 'Please select a plan before continuing.'
-
-function validatePersonalInfo(values: PersonalInfo): PersonalInfoErrors {
-  const errors: PersonalInfoErrors = {}
-  for (const field of Object.keys(values) as (keyof PersonalInfo)[]) {
-    if (!values[field].trim()) errors[field] = REQUIRED_MESSAGE
-  }
-  return errors
-}
-
-function App() {
-  const [step, setStep] = useState(0)
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({ name: '', email: '', phone: '' })
-  const [errors, setErrors] = useState<PersonalInfoErrors>({})
-  const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null)
-  const [planDateSetAs, setPlanDateSetAs] = useState<PlanDate>('monthly')
-  const [selectedAddOns, setSelectedAddOns] = useState<AddOnId[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // Move focus to the new step's heading so screen reader users hear where they are.
-  const headingRef = useRef<HTMLHeadingElement>(null)
+const App = () => {
+  const [step, setStep] = useState<Step>(1)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
+
+  // Move focus to the new step's heading so keyboard and screen reader users land on it.
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
       return
     }
-    headingRef.current?.focus()
+    bodyRef.current?.querySelector<HTMLHeadingElement>('h2')?.focus()
   }, [step])
 
-  const handlePersonalInfoChange = (field: keyof PersonalInfo, value: string) => {
-    setPersonalInfo((current) => ({ ...current, [field]: value }))
-    if (errors[field] && value.trim()) {
-      setErrors((current) => ({ ...current, [field]: undefined }))
-    }
+  const goTo = (next: Step) => {
+    setSaveError(null)
+    setStep(next)
   }
 
-  const handleToggleAddOn = (addOn: AddOnId) => {
-    setSelectedAddOns((current) =>
-      current.includes(addOn) ? current.filter((id) => id !== addOn) : [...current, addOn],
-    )
+  const handleSubmit = async (values: FormValues) => {
+    switch (step) {
+      case 1:
+        goTo(2)
+        break
+      case 2:
+        if (!values.plan) {
+          window.alert('Please select a plan before continuing.')
+          return
+        }
+        goTo(3)
+        break
+      case 3:
+        goTo(4)
+        break
+      case 4:
+        try {
+          if (API_URL) {
+            await postMember(toNewMember(values))
+          } else {
+            console.info('No API configured (VITE_API_URL); skipping save.')
+          }
+          goTo(5)
+        } catch (error) {
+          console.error(error)
+          setSaveError("Sorry, we couldn't save your subscription. Please try again.")
+        }
+        break
+    }
   }
-
-  const submitMember = async (planId: PlanId) => {
-    const plan = PLANS.find(({ id }) => id === planId)!
-    const addOns = ADD_ONS.filter(({ id }) => selectedAddOns.includes(id))
-
-    setIsSubmitting(true)
-    try {
-      await postMember({
-        ...personalInfo,
-        plan: plan.name,
-        planDateSetAs,
-        planPrice: plan.price[planDateSetAs],
-        addOns: addOns.map((addOn) => ({ name: addOn.name, price: addOn.price[planDateSetAs] })),
-        total: getTotal(plan, addOns, planDateSetAs),
-        createdAt: new Date().toISOString(),
-      })
-    } catch (error) {
-      // json-server only runs locally, so the hosted demo still reaches the thank-you screen.
-      console.error(error)
-    } finally {
-      setIsSubmitting(false)
-    }
-    setStep(THANK_YOU_STEP)
-  }
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (isSubmitting) return
-
-    if (step === 0) {
-      const nextErrors = validatePersonalInfo(personalInfo)
-      setErrors(nextErrors)
-      const firstInvalid = (Object.keys(nextErrors) as (keyof PersonalInfo)[])[0]
-      if (firstInvalid) {
-        document.getElementById(firstInvalid)?.focus()
-        return
-      }
-    }
-
-    if (step === 1 && !selectedPlan) {
-      window.alert(PLAN_REQUIRED_MESSAGE)
-      return
-    }
-
-    if (step === LAST_STEP && selectedPlan) {
-      void submitMember(selectedPlan)
-      return
-    }
-
-    setStep((current) => Math.min(current + 1, LAST_STEP))
-  }
-
-  const goBack = () => setStep((current) => Math.max(current - 1, 0))
-
-  const isThankYou = step === THANK_YOU_STEP
 
   return (
-    <main className="app">
-      <h1 className="visually-hidden">Multi-step subscription form</h1>
+    <main className="page">
+      <h1 className="visually-hidden">Multi-step form</h1>
 
       <div className="card">
-        <Sidebar activeStep={Math.min(step, LAST_STEP)} />
+        <Sidebar activeStep={Math.min(step, 4)} />
 
-        <form className="card__content" onSubmit={handleSubmit} noValidate>
-          {step === 0 && (
-            <PersonalInfoStep
-              values={personalInfo}
-              errors={errors}
-              onChange={handlePersonalInfoChange}
-              headingRef={headingRef}
-            />
-          )}
-          {step === 1 && (
-            <SelectPlanStep
-              selectedPlan={selectedPlan}
-              planDateSetAs={planDateSetAs}
-              onSelectPlan={setSelectedPlan}
-              onChangePlanDate={setPlanDateSetAs}
-              headingRef={headingRef}
-            />
-          )}
-          {step === 2 && (
-            <AddOnsStep
-              selectedAddOns={selectedAddOns}
-              planDateSetAs={planDateSetAs}
-              onToggleAddOn={handleToggleAddOn}
-              headingRef={headingRef}
-            />
-          )}
-          {step === 3 && selectedPlan && (
-            <SummaryStep
-              selectedPlan={selectedPlan}
-              selectedAddOns={selectedAddOns}
-              planDateSetAs={planDateSetAs}
-              onChangePlan={() => setStep(1)}
-              headingRef={headingRef}
-            />
-          )}
-          {isThankYou && <ThankYouStep headingRef={headingRef} />}
+        <Formik
+          initialValues={initialValues}
+          validationSchema={step === 1 ? personalInfoSchema : undefined}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className={`form${step === 5 ? ' form--complete' : ''}`} noValidate>
+              <div className="form__body" ref={bodyRef}>
+                {step === 1 && <PersonalInfoStep />}
+                {step === 2 && <SelectPlanStep />}
+                {step === 3 && <AddOnsStep />}
+                {step === 4 && <SummaryStep onChangePlan={() => goTo(2)} />}
+                {step === 5 && <ThankYouStep />}
 
-          {!isThankYou && (
-            <footer className="form-nav">
-              {step > 0 && (
-                <button type="button" className="button button--back" onClick={goBack}>
-                  Go Back
-                </button>
+                {saveError && (
+                  <p className="form__error" role="alert">
+                    {saveError}
+                  </p>
+                )}
+              </div>
+
+              {step < 5 && (
+                <div className="form__footer">
+                  {step > 1 && (
+                    <button type="button" className="btn btn--back" onClick={() => goTo((step - 1) as Step)}>
+                      Go Back
+                    </button>
+                  )}
+                  {step < 4 ? (
+                    <button key="next" type="submit" className="btn btn--next">
+                      Next Step
+                    </button>
+                  ) : (
+                    <button key="confirm" type="submit" className="btn btn--confirm" disabled={isSubmitting}>
+                      Confirm
+                    </button>
+                  )}
+                </div>
               )}
-              {step === LAST_STEP ? (
-                <button type="submit" className="button button--confirm" disabled={isSubmitting}>
-                  Confirm
-                </button>
-              ) : (
-                <button type="submit" className="button button--next">
-                  Next Step
-                </button>
-              )}
-            </footer>
+            </Form>
           )}
-        </form>
+        </Formik>
       </div>
     </main>
   )

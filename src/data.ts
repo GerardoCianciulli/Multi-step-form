@@ -1,44 +1,59 @@
-import arcadeIcon from './assets/images/icon-arcade.svg'
-import advancedIcon from './assets/images/icon-advanced.svg'
-import proIcon from './assets/images/icon-pro.svg'
+import iconArcade from './assets/images/icon-arcade.svg'
+import iconAdvanced from './assets/images/icon-advanced.svg'
+import iconPro from './assets/images/icon-pro.svg'
 
 export type PlanDate = 'monthly' | 'yearly'
-
 export type PlanId = 'arcade' | 'advanced' | 'pro'
-
 export type AddOnId = 'online-service' | 'larger-storage' | 'customizable-profile'
 
-export type Price = Record<PlanDate, number>
+type Pricing = Record<PlanDate, number>
 
 export type Plan = {
   id: PlanId
   name: string
   icon: string
-  price: Price
+  price: Pricing
 }
 
 export type AddOn = {
   id: AddOnId
   name: string
   description: string
-  price: Price
+  price: Pricing
 }
 
-export type PersonalInfo = {
+export type FormValues = {
   name: string
   email: string
   phone: string
+  plan: PlanId | ''
+  planDateSetAs: PlanDate
+  addOns: AddOnId[]
 }
 
-export const STEPS = ['Your info', 'Select plan', 'Add-ons', 'Summary'] as const
+export const initialValues: FormValues = {
+  name: '',
+  email: '',
+  phone: '',
+  plan: '',
+  planDateSetAs: 'monthly',
+  addOns: [],
+}
 
-export const PLANS: Plan[] = [
-  { id: 'arcade', name: 'Arcade', icon: arcadeIcon, price: { monthly: 9, yearly: 90 } },
-  { id: 'advanced', name: 'Advanced', icon: advancedIcon, price: { monthly: 12, yearly: 120 } },
-  { id: 'pro', name: 'Pro', icon: proIcon, price: { monthly: 15, yearly: 150 } },
+export const steps = [
+  { number: 1, title: 'Your info' },
+  { number: 2, title: 'Select plan' },
+  { number: 3, title: 'Add-ons' },
+  { number: 4, title: 'Summary' },
+] as const
+
+export const plans: Plan[] = [
+  { id: 'arcade', name: 'Arcade', icon: iconArcade, price: { monthly: 9, yearly: 90 } },
+  { id: 'advanced', name: 'Advanced', icon: iconAdvanced, price: { monthly: 12, yearly: 120 } },
+  { id: 'pro', name: 'Pro', icon: iconPro, price: { monthly: 15, yearly: 150 } },
 ]
 
-export const ADD_ONS: AddOn[] = [
+export const addOns: AddOn[] = [
   {
     id: 'online-service',
     name: 'Online service',
@@ -59,12 +74,23 @@ export const ADD_ONS: AddOn[] = [
   },
 ]
 
-/** Formats a price for the current billing period, e.g. "$9/mo", "+$20/yr". */
-export function formatPrice(amount: number, planDateSetAs: PlanDate, sign = '') {
-  return `${sign}$${amount}/${planDateSetAs === 'monthly' ? 'mo' : 'yr'}`
+/** e.g. formatPrice(9, 'monthly') → "$9/mo", formatPrice(10, 'yearly', true) → "+$10/yr" */
+export function formatPrice(amount: number, planDateSetAs: PlanDate, withPlus = false) {
+  const period = planDateSetAs === 'monthly' ? 'mo' : 'yr'
+  return `${withPlus ? '+' : ''}$${amount}/${period}`
 }
 
-/** Plan price plus every selected add-on, for the current billing period. */
-export function getTotal(plan: Plan, addOns: AddOn[], planDateSetAs: PlanDate) {
-  return addOns.reduce((sum, addOn) => sum + addOn.price[planDateSetAs], plan.price[planDateSetAs])
+/** Resolves the selected plan and add-ons, with prices for the chosen billing period. */
+export function getOrderSummary(values: FormValues) {
+  const plan = plans.find((p) => p.id === values.plan)
+  const selectedAddOns = addOns.filter((a) => values.addOns.includes(a.id))
+  const planPrice = plan ? plan.price[values.planDateSetAs] : 0
+  const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price[values.planDateSetAs], 0)
+
+  return {
+    plan,
+    planPrice,
+    addOns: selectedAddOns,
+    total: planPrice + addOnsTotal,
+  }
 }

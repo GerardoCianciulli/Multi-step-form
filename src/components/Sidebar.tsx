@@ -1,32 +1,32 @@
-import { STEPS } from '../data'
+import { steps } from '../data'
 
 type SidebarProps = {
   activeStep: number
 }
 
-const Sidebar = ({ activeStep }: SidebarProps) => {
-  return (
-    <aside className="sidebar">
-      <ol className="sidebar__steps">
-        {STEPS.map((title, index) => {
-          const isActive = index === activeStep
-          return (
-            <li
-              key={title}
-              className={`sidebar__step${isActive ? ' sidebar__step--active' : ''}`}
-              aria-current={isActive ? 'step' : undefined}
-            >
-              <span className="sidebar__number">{index + 1}</span>
-              <div className="sidebar__info">
-                <span className="sidebar__label">Step {index + 1}</span>
-                <h3 className="sidebar__title">{title}</h3>
-              </div>
-            </li>
-          )
-        })}
-      </ol>
-    </aside>
-  )
-}
+const Sidebar = ({ activeStep }: SidebarProps) => (
+  <aside className="sidebar" aria-label="Form progress">
+    <ol className="sidebar__steps">
+      {steps.map((step) => {
+        const isActive = step.number === activeStep
+        return (
+          <li
+            key={step.number}
+            className={`sidebar__step${isActive ? ' sidebar__step--active' : ''}`}
+            aria-current={isActive ? 'step' : undefined}
+          >
+            <span className="sidebar__number" aria-hidden="true">
+              {step.number}
+            </span>
+            <div className="sidebar__text">
+              <p className="sidebar__label">Step {step.number}</p>
+              <h3 className="sidebar__title">{step.title}</h3>
+            </div>
+          </li>
+        )
+      })}
+    </ol>
+  </aside>
+)
 
 export default Sidebar

@@ -2,7 +2,6 @@
   font-family: 'Ubuntu';
   src: url('./assets/fonts/Ubuntu-Regular.ttf') format('truetype');
   font-weight: 400;
-  font-style: normal;
   font-display: swap;
 }
 
@@ -10,7 +9,6 @@
   font-family: 'Ubuntu';
   src: url('./assets/fonts/Ubuntu-Medium.ttf') format('truetype');
   font-weight: 500;
-  font-style: normal;
   font-display: swap;
 }
 
@@ -18,14 +16,15 @@
   font-family: 'Ubuntu';
   src: url('./assets/fonts/Ubuntu-Bold.ttf') format('truetype');
   font-weight: 700;
-  font-style: normal;
   font-display: swap;
 }
 
 :root {
   /* Primary */
   --marine-blue: hsl(213, 96%, 18%);
+  --marine-blue-hover: hsl(213, 73%, 31%);
   --purplish-blue: hsl(243, 100%, 62%);
+  --purplish-blue-hover: hsl(243, 100%, 77%);
   --pastel-blue: hsl(228, 100%, 84%);
   --light-blue: hsl(206, 94%, 87%);
   --strawberry-red: hsl(354, 84%, 57%);
@@ -37,18 +36,15 @@
   --alabaster: hsl(231, 100%, 99%);
   --white: hsl(0, 0%, 100%);
 
-  /* Interactive states taken from the active-state designs */
-  --marine-blue-hover: hsl(213, 72%, 32%);
-  --purplish-blue-hover: hsl(243, 100%, 77%);
-
-  --font-family: 'Ubuntu', sans-serif;
-  --shadow-card: 0 1.5625rem 2.5rem -1.25rem hsla(0, 0%, 0%, 0.1);
+  --font-family: 'Ubuntu', system-ui, sans-serif;
+  --shadow: 0 1.5625rem 2.5rem -1.25rem hsla(0, 0%, 0%, 0.095);
 
   font-family: var(--font-family);
   font-size: 100%;
-  line-height: 1.5;
+  line-height: 1.15;
   color: var(--marine-blue);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 *,
@@ -57,14 +53,32 @@
   box-sizing: border-box;
 }
 
-* {
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+fieldset {
   margin: 0;
+  padding: 0;
 }
 
 body {
+  min-height: 100vh;
   min-height: 100dvh;
   background-color: var(--magnolia);
-  font-size: 1rem;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+fieldset {
+  border: 0;
+  min-width: 0;
 }
 
 img {
@@ -72,33 +86,20 @@ img {
   max-width: 100%;
 }
 
-input,
-button {
+button,
+input {
   font: inherit;
   color: inherit;
 }
 
 button {
   cursor: pointer;
-  border: 0;
   background: none;
-  padding: 0;
-}
-
-ol,
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-fieldset {
   border: 0;
-  padding: 0;
-  min-width: 0;
 }
 
 .visually-hidden {
-  position: absolute;
+  position: absolute !important;
   width: 0.0625rem;
   height: 0.0625rem;
   padding: 0;
